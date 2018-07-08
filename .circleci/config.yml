@@ -5,13 +5,15 @@ jobs:
             - image: circleci/openjdk:8-jdk
         steps:
             - checkout
-            - run: df -hlT
             - run:
-                name: Update the Distribution
+                name: Prepare the Distribution
                 command: |
+                  echo -e "The Disk Space is --- \n"
+                  df -hlT
+                  echo -e "Updating the Programs --- \n"
                   sudo apt-get update -y
                   sudo apt-get upgrade -y
-                  sudo apt-get install curl git pxz wput -y
+                  sudo apt-get install pxz wput -y
             - run:
                 name: Create act.sh
                 command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo "Disk Used Now "' "df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
@@ -22,4 +24,3 @@ jobs:
             - store_artifacts:
                 path: $DIR/upload/$RecName-$BRANCH*
             - run: kill $(cat act_sh.pid) || echo "Process is not running."
-            - run: df -hlT

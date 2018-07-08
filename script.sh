@@ -18,18 +18,6 @@ FTPHost=$6
 FTPUser=$7
 FTPPass=$8
 
-# Colors
-CL_XOS="\033[34;1m"
-CL_PFX="\033[33m"
-CL_INS="\033[36m"
-CL_RED="\033[31m"
-CL_GRN="\033[32m"
-CL_YLW="\033[33m"
-CL_BLU="\033[34m"
-CL_MAG="\033[35m"
-CL_CYN="\033[36m"
-CL_RST="\033[0m"
-
 # Get the latest repo
 mkdir ~/bin
 PATH=~/bin:$PATH
@@ -48,19 +36,19 @@ cd $DIR; mkdir $RecName; cd $RecName
 repo init -q -u $LINK -b $BRANCH --depth 1
 
 # Sync it up!
-time repo sync -c -f --force-sync --no-clone-bundle --no-tags -j32
-echo -e $CL_RED"\nSHALLOW Source Syncing done"$CL_RST
+time repo sync -c -f -q --force-sync --no-clone-bundle --no-tags -j32
+echo -e "\nSHALLOW Source Syncing done"$
 
 rm -rf .repo/
 
 # Compress non-repo folder in one piece
-echo -e $CL_RED"Compressing files ---  "$CL_RST
+echo -e "Compressing files ---  "
 
 export XZ_OPT=-9e
 time tar -I pxz -cf $RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz *
 
 # Show Total Sizes of the compressed files
-echo -en $CL_BLU"Final Compressed size of the checked-out files is ---  "$CL_RST
+echo -en "Final Compressed size of the checked-out files is ---  "
 du -sh $RecName-$BRANCH-norepo*.tar.xz
 
 # Basic Cleanup
@@ -68,11 +56,11 @@ mv $RecName-$BRANCH* upload/
 cd .. && rm -rf $RecName
 
 cd upload
-echo -e $CL_PFX" Taking md5sums "$CL_RST
+echo -e " Taking md5sums "
 md5sum $RecName-$BRANCH* > $RecName-$BRANCH-norepo-$(date +%Y%m%d).md5sum
 
 for file in $RecName-$BRANCH*; do wput $file ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//$RecName-NoRepo/ ; done
-echo -e $CL_XOS" Done uploading "$CL_RST
+echo -e " Done uploading "
 
 cd $DIR
-echo -e $CL_GRN"\nCongratulations! Job Done!"$CL_RST
+echo -e "\nCongratulations! Job Done!
