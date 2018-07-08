@@ -7,6 +7,9 @@
 # To be used to Release on AndroidFileHost
 # -----------------------------------------------------
 
+# Clear all
+rm -rf ~/project/*
+
 # Definitions
 DIR=$(pwd)
 RecName=$1
@@ -37,9 +40,15 @@ repo init -q -u $LINK -b $BRANCH --depth 1
 
 # Sync it up!
 time repo sync -c -f -q --force-sync --no-clone-bundle --no-tags -j32
-echo -e "\nSHALLOW Source Syncing done"$
+echo -e "\nSHALLOW Source Syncing done\n"
 
 rm -rf .repo/
+
+# Show Total Sizes of the checked-out non-repo files
+cd $DIR
+echo -en "The total size of the checked-out files is ---  "
+du -sh $RecName
+cd $RecName
 
 # Compress non-repo folder in one piece
 echo -e "Compressing files ---  "
@@ -52,8 +61,9 @@ echo -en "Final Compressed size of the checked-out files is ---  "
 du -sh $RecName-$BRANCH-norepo*.tar.xz
 
 # Basic Cleanup
-mv $RecName-$BRANCH* upload/
-cd .. && rm -rf $RecName
+mkdir ../upload
+mv $RecName-$BRANCH* ../upload/
+cd $DIR && rm -rf $RecName
 
 cd upload
 echo -e " Taking md5sums "

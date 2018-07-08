@@ -8,9 +8,9 @@ jobs:
             - run:
                 name: Prepare the Distribution
                 command: |
-                  echo -e "The Disk Space is --- \n"
-                  df -hlT
-                  echo -e "Updating the Programs --- \n"
+                  echo -en "The Disk Usage (out of 630GB) is --- "
+                  df -hlT | awk '{ print $4 }' | sort -g | tail -n 1
+                  echo -e "\nUpdating the Programs --- "
                   sudo apt-get update -y
                   sudo apt-get upgrade -y
                   sudo apt-get install pxz wput -y
