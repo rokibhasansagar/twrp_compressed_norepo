@@ -16,11 +16,11 @@ jobs:
                   sudo apt-get install pxz wput -y
             - run:
                 name: Create act.sh
-                command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo "Disk Used Now "' "df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
+                command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo -en "Disk Used Now "' "  df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
             - run: chmod +x ./script.sh ./act.sh
             - run:
                 name: Fire-Up the Program
                 command: echo "Running..."; ./act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
             - store_artifacts:
-                path: $DIR/upload/$RecName-$BRANCH*
+                path: $RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz
             - run: kill $(cat act_sh.pid) || echo "Process is not running."
