@@ -9,9 +9,9 @@ jobs:
             - run:
                 name: Update the Distribution
                 command: |
-                  apt-get update -y
-                  apt-get upgrade -y
-                  apt-get install curl git pxz wput -y
+                  sudo apt-get update -y
+                  sudo apt-get upgrade -y
+                  sudo apt-get install curl git pxz wput -y
             - run:
                 name: Create act.sh
                 command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo "Disk Used Now "' "df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
