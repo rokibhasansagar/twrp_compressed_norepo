@@ -1,0 +1,23 @@
+version: 2
+jobs:
+    build:
+        docker:
+            - image: debian:stretch
+        steps:
+            - checkout
+            - run: df -hlT
+            - run:
+                name: Update the Distribution
+                command: apt-get update -y && apt-get upgrade -y && apt-get install git pxz wput -y
+            - run: df -hlT
+            - run:
+                name: Create act.sh
+                command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo "Disk Used Now "' "df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
+            - run: chmod +x ./script.sh ./act.sh
+            - run:
+                name: Fire-Up the Program
+                command: echo "Running..."; ./act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
+            - store_artifacts:
+                path: $DIR/upload/$RecName-$BRANCH*
+            - run: kill $(cat act_sh.pid) || echo "Process is not running."
+            - run: df -hlT
