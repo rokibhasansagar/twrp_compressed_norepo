@@ -7,9 +7,6 @@
 # To be used to Release on AndroidFileHost
 # -----------------------------------------------------
 
-# Clear all
-rm -rf ~/project/*
-
 # Definitions
 DIR=$(pwd)
 echo $DIR
@@ -69,6 +66,7 @@ cd $DIR
 # Basic Cleanup
 rm -rf $RecName
 
-for file in ~/project/files/$RecName-$BRANCH*; do wput $file ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//$RecName-NoRepo/ ; done
+cd ~/project/files/
+for file in $RecName-$BRANCH*; do wput $file ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//$RecName-NoRepo/ ; done
 echo -e " Done uploading "
 echo -e "\nCongratulations! Job Done!"
