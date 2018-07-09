@@ -55,15 +55,20 @@ cd $RecName
 echo -e "Compressing files ---  "
 
 export XZ_OPT=-9e
-time tar -I pxz -cf ~/project/$RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz *
+time tar -I pxz -cf $RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz *
+echo -e "Compression Done"
+
+mkdir -p ~/project/files/ && mv $RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz ~/project/files/
+cd ~/project/files && md5sum $RecName*.tar.xz > $RecName-$BRANCH-norepo-$(date +%Y%m%d).md5sum
 
 # Show Total Sizes of the compressed files
 echo -en "Final Compressed size of the checked-out files is ---  "
-du -sh ~/project/$RecName-$BRANCH-norepo*.tar.xz
+du -sh ~/project/files/
 
+cd $DIR
 # Basic Cleanup
 rm -rf $RecName
 
-for file in ~/project/$RecName-$BRANCH*; do wput $file ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//$RecName-NoRepo/ ; done
+for file in ~/project/files/$RecName-$BRANCH*; do wput $file ftp://"$FTPUser":"$FTPPass"@"$FTPHost"//$RecName-NoRepo/ ; done
 echo -e " Done uploading "
 echo -e "\nCongratulations! Job Done!"

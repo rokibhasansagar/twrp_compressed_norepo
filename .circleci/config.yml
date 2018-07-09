@@ -8,19 +8,36 @@ jobs:
             - run:
                 name: Prepare the Distribution
                 command: |
-                  echo -en "The Disk Usage (out of 630GB) is --- "
-                  df -hlT | awk '{ print $4 }' | sort -g | tail -n 1
-                  echo -e "\nUpdating the Programs --- "
+                  echo -e "Updating the Programs --- "
                   sudo apt-get update -y
                   sudo apt-get upgrade -y
                   sudo apt-get install pxz wput -y
             - run:
                 name: Create act.sh
-                command: printf '%s\n' '#!/bin/sh' '' 'echo $$ >> act_sh.pid' 'while true; do' '  echo -en "Disk Used Now "' "  df -hlT | awk '{ print \$4 }' | sort -g | tail -n 1" '  sleep 120' 'done' >act.sh
-            - run: chmod +x ./script.sh ./act.sh
+                command: |
+                  cat << EOF > /tmp/act.sh
+                  #!/bin/sh
+                  echo $$ >> /tmp/act_sh.pid
+                  echo -en "Total Disk Size --- "
+                  df -hlT | awk '{ print $3 }' | sort -g | tail -n 1
+                  while true; do
+                    echo -en "The Disk Usage is --- "
+                    df -hlT | awk '{ print $4 }' | sort -g | tail -n 1
+                    sleep 120
+                  done
+                  EOF
+            - run: chmod +x ./script.sh && chmod +x /tmp/act.sh
             - run:
                 name: Fire-Up the Program
-                command: echo "Running..."; ./act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
-            - store_artifacts:
-                path: $RecName-$BRANCH-norepo-$(date +%Y%m%d).tar.xz
-            - run: kill $(cat act_sh.pid) || echo "Process is not running."
+                command: echo "Running..."; /tmp/act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
+            - run:
+                name: Setup Github Release
+                command: |
+                  wget 'https://github.com/tcnksm/ghr/releases/download/v0.10.1/ghr_v0.10.1_linux_amd64.tar.gz'
+                  tar -xzf ghr_v*_linux_amd64.tar.gz && rm ghr_v*_linux_amd64.tar.gz
+                  cp ghr_v*_linux_amd64/ghr ~/bin && PATH=~/bin:$PATH
+                  rm -rf ghr_v*_linux_amd64/
+            - run: kill $(cat /tmp/act_sh.pid) || echo "Process is not running."
+            - run:
+                name: GitHub Release
+                command: ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
