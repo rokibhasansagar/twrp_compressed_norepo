@@ -27,4 +27,4 @@ jobs:
                 command: |
                   echo $(pwd)
                   PATH=~/bin:$PATH
-ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
+                  ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
