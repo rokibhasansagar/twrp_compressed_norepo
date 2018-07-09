@@ -19,9 +19,16 @@ FTPHost=$6
 FTPUser=$7
 FTPPass=$8
 
+sudo apt-get update -y && sudo apt-get upgrade -y
+sudo apt-get install pxz wput -y
+wget -q 'https://github.com/tcnksm/ghr/releases/download/v0.10.1/ghr_v0.10.1_linux_amd64.tar.gz'
+tar -xzf ghr_v0.10.1_linux_amd64.tar.gz && rm ghr_v0.10.1_linux_amd64.tar.gz
+mkdir ~/bin; cp ghr_v0.10.1_linux_amd64/ghr ~/bin && PATH=~/bin:$PATH
+rm -rf ghr_v0.10.1_linux_amd64/
+ghr --help
+
 # Get the latest repo
-mkdir ~/bin
-PATH=~/bin:$PATH
+mkdir ~/bin; PATH=~/bin:$PATH
 curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
 chmod a+x ~/bin/repo
 

@@ -6,17 +6,8 @@ jobs:
         steps:
             - checkout
             - run:
-                name: Prepare the Distribution
+                name: Create act-shell
                 command: |
-                  cat << EOF > /tmp/set.sh
-                  #!/bin/bash
-                  sudo apt-get update -y && sudo apt-get upgrade -y
-                  sudo apt-get install pxz wput -y
-                  wget 'https://github.com/tcnksm/ghr/releases/download/v0.10.1/ghr_v0.10.1_linux_amd64.tar.gz'
-                  tar -xzf ghr_v0.10.1_linux_amd64.tar.gz && rm ghr_v0.10.1_linux_amd64.tar.gz
-                  mkdir ~/bin; cp ghr_v0.10.1_linux_amd64/ghr ~/bin && PATH=~/bin:$PATH
-                  rm -rf ghr_v0.10.1_linux_amd64/
-                  EOF
                   cat << EOF > /tmp/act.sh
                   #!/bin/sh
                   while true; do
@@ -25,13 +16,10 @@ jobs:
                     sleep 180
                   done
                   EOF
-            - run: chmod +x ./script.sh && chmod +x /tmp/act.sh /tmp/set.sh
-            - run:
-                name: Make Up2date
-                command: /tmp/set.sh
+            - run: chmod +x ./script.sh && chmod +x /tmp/act.sh
             - run:
                 name: Fire-Up the Program
                 command: echo "Running..."; /tmp/act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
             - run:
                 name: GitHub Release
-                command: ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
+                command: echo $(pwd); ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
