@@ -9,17 +9,22 @@ jobs:
                 name: Create act-shell
                 command: |
                   cat << EOF > /tmp/act.sh
-                  #!/bin/sh
+                  #!/bin/bash
                   while true; do
-                    echo -en "The Disk Usage is --- "
-                    df -hlT | awk '{ print $4 }' | sort -g | tail -n 1
+                    echo -en "The Time is --- "
+                    date
                     sleep 180
                   done
                   EOF
-            - run: chmod +x ./script.sh && chmod +x /tmp/act.sh
+            - run:
+                name: Access Permission
+                command: chmod +x ./script.sh && chmod +x /tmp/act.sh
             - run:
                 name: Fire-Up the Program
                 command: echo "Running..."; /tmp/act.sh & ./script.sh $RecName $LINK $BRANCH $GitHubMail $GitHubName $FTPHost $FTPUser $FTPPass
             - run:
                 name: GitHub Release
-                command: echo $(pwd); ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
+                command: |
+                  echo $(pwd)
+                  PATH=~/bin:$PATH
+ghr -u $GitHubName -t $GITHUB_TOKEN -b 'Relesing $RecName-$BRANCH' v1.0.0 files
